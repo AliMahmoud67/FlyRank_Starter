@@ -1,0 +1,8 @@
+{
+  "test_rows": 50625,
+  "base_rate": 0.2703604938271605,
+  "precision_at_20_baseline": 0.65,
+  "precision_at_20_model": 0.75,
+  "precision_at_50_baseline": 0.66,
+  "precision_at_50_model": 0.78
+}
