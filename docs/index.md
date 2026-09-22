@@ -5,11 +5,6 @@
 - **Repo:** https://github.com/AliMahmoud67/FlyRank_Starter
 - **Date:** 2026-09-21
 
-> Copy this file to `work/capstone_report.md` and fill it in as you build. Sections 1–8
-> mirror the Pass / Needs-Work rubric axes, so nothing here is optional. Sections 0 and 9
-> are **paper sections**: your deployed research paper must carry both, and they're here so
-> you never rebuild them from memory at ship time.
-
 ## 0. Abstract
 
 This project asks whether search and content signals can be used to rank pages that are worth reviewing or refreshing so editors can prioritize their limited time. Using the FlyRank internship warehouse, February 2026 data was used as the feature window and March 2026 as the future outcome window, with five search and content features and 50,625 complete held-out test items. A time-aware Random Forest ranking model was compared with a transparent two-signal baseline using Precision@20 and Precision@50. The Random Forest achieved 75% Precision@20 and 78% Precision@50, compared with 65% and 66% for the baseline, with a 27.04% future-opportunity base rate. The resulting ranked queue is intended to help editors decide which pages to investigate first, while keeping the final refresh decision with human reviewers.
