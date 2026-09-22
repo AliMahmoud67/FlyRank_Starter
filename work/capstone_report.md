@@ -62,7 +62,7 @@ The following fields are deliberately excluded:
 
 GSC availability is checked so missing search data is treated as unavailable data rather than zero performance.
 
-The project uses pseudonymized data and does not include client names, domains, URLs, private search queries, credentials
+The project uses pseudonymized data and does not include client names, domains, URLs, private search queries, credentials.
 
 ## 3. Baseline
 
@@ -77,49 +77,119 @@ The resulting score ranges from 0 to 2. Higher scores indicate a stronger reason
 
 The final evaluation population contains 50,625 content items after removing rows with missing values in the model feature set. The future-opportunity base rate in this evaluation population is 27.04%.
 
-The baseline was evaluated on the same 50,625 items and with the same ranking metrics used for the Random Forest model.
+The baseline was evaluated on the same 50,625 items and using the same ranking metrics as the Random Forest model.
 
 | Metric | Baseline |
 |---|---:|
-| Precision@20 | 40.00% |
-| Precision@50 | 44.00% |
+| Precision@20 | 65.00% |
+| Precision@50 | 66.00% |
 
 The baseline is intentionally simple and explainable. It provides a transparent reference point for evaluating whether the learned model adds useful ranking signal.
 
 ## 4. Model / analysis
 
-Your method and why it fits the lane. The exact feature list (and what you left out on
-purpose). The target or proxy definition, in one sentence.
+A Random Forest classifier was used to estimate the probability that a content item would become a future review opportunity.
+
+The model uses five February features:
+
+- `gsc_impressions`
+- `gsc_clicks`
+- `gsc_avg_position`
+- `word_count`
+- `content_age_days`
+
+The model outputs a probability score for each page, which is used to rank the pages.
+
+The target is a future content-opportunity proxy: a page is labeled as an opportunity when its March CTR is in the bottom 25% among pages with a similar February search-position group, using pages with at least 100 March impressions.
+
+The model deliberately excludes March performance fields, `trend_direction`, `trend_pct`, `is_declining_label`, product decision flags, and pseudonymous IDs from the feature set.
 
 ## 5. Evaluation
 
-Your split (grouped by client? time-aware?) and why. Metrics, model vs baseline **on the same
-split**. What the errors look like — a short error analysis beats a big metric table.
+A time-aware evaluation was used to approximate the real deployment situation.
+
+Historical month pairs were used for training:
+
+- August 2025 → September 2025
+- September 2025 → October 2025
+- October 2025 → November 2025
+- November 2025 → December 2025
+- December 2025 → January 2026
+- January 2026 → February 2026
+
+The final February 2026 → March 2026 period was held out as the future test period.
+
+After removing rows with missing model features, the test set contained 50,625 content items. The future-opportunity base rate was 27.04%.
+
+| Metric | Baseline | Random Forest |
+|---|---:|---:|
+| Precision@20 | 65.00% | 75.00% |
+| Precision@50 | 66.00% | 78.00% |
+
+The Random Forest produced higher precision at both review capacities.
+
+In the top 20 model-ranked pages, 15 were future opportunities and 5 were not. The five false positives included pages with very low or zero February clicks and relatively low impression counts, suggesting that sparse observations can make some pages difficult to rank correctly.
+
+The evaluation is directional decision support rather than a claim that the model will always identify pages that benefit from a refresh.
 
 ## 6. Interpretation
 
-What the model/clusters actually found. Feature importances or cluster profiles in plain
-words. Surprises and negative results — a well-understood "no effect" is a valid result.
+The feature importance results from the Random Forest were:
+
+| Feature | Importance |
+|---|---:|
+| `gsc_clicks` | 0.3347 |
+| `gsc_impressions` | 0.2872 |
+| `word_count` | 0.1481 |
+| `content_age_days` | 0.1160 |
+| `gsc_avg_position` | 0.1141 |
+
+The model relied most on February clicks and impressions. Content length, content age, and search position contributed smaller amounts individually.
+
+This suggests that the model found search-volume and click-performance information particularly useful for distinguishing future opportunities in this dataset.
+
+The error analysis showed that some high-scoring pages did not become future opportunities. Several of these pages had zero February clicks and relatively low impression counts, indicating that sparse search data can make the future outcome harder to identify.
+
+These feature-importance results describe associations used by the fitted model and should not be interpreted as causal effects.
 
 ## 7. Recommendation
 
-The ranked actions or decisions your output supports, and how a FlyRank editor would use them
-tomorrow. State your confidence and the limits explicitly.
+The main output is a ranked review queue.
+
+A FlyRank editor can use the model score to prioritize pages for review, starting with the highest-ranked content and then checking the page manually before taking action.
+
+The recommended workflow is:
+
+1. Review the highest-scoring pages first.
+2. Check whether the page is still useful and up to date.
+3. Inspect its search visibility and click performance.
+4. Decide whether to refresh, leave unchanged, or investigate another cause of weak performance.
+
+The model provides prioritization support rather than an automatic refresh decision. A high score does not guarantee that a page needs a refresh, and the editor should consider context that is not represented in the five model features.
+
+Confidence is higher in the aggregate ranking result than in any individual page recommendation because the top-ranked list still contains false positives.
 
 ## 8. Reproducibility
 
-The exact commands to re-run everything from a fresh clone, your random seeds, and your
-environment (`pip freeze` highlights or `requirements.txt` deltas). If you claim a sealed or
-holdout evaluation, two things must be committed: the cell/script that builds the sealed
-frame, and the metrics file it produced — "evaluated once, blind" should be checkable from
-your repo, not taken on faith.
+The analysis is implemented in `work/notebooks/capstone.ipynb`.
+
+The notebook reads the FlyRank warehouse through DuckDB and uses pandas and scikit-learn for the feature preparation, model training, ranking, and evaluation.
+
+The Random Forest uses:
+
+- `n_estimators=200`
+- `min_samples_leaf=10`
+- `random_state=42`
+
+The evaluation can be reproduced by opening the notebook from the GitHub repository in Google Colab, providing the read-only Hugging Face token through the `HF_TOKEN` Colab Secret, and running the notebook from top to bottom.
+
+The final submission should record the exact package versions used in the final run so that the reported metrics can be reproduced from the repository.
 
 ## 9. Acknowledgments & data credit
 
-One short section at the bottom of the deployed paper: "Built on the FlyRank ML Internship
-dataset" **linking to https://flyrank.ai**. Crediting your data source is standard research
-practice — and it's on the capstone's required-section list, so a paper without it isn't done.
+Built on the FlyRank ML Internship dataset.
 
+Data source: [FlyRank](https://flyrank.ai)
 ---
 
 > **Claims checklist before submitting:** observed / measured / directional / decision-support
