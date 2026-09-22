@@ -126,6 +126,8 @@ In the model's top 20 ranked pages, 16 were future opportunities and 4 were not.
 
 The results are directional decision support for this dataset and time period, not a guarantee of future performance.
 
+![Precision@K comparison](../work/outputs/charts/precision_comparison.png)
+
 ## 6. Interpretation
 
 The Random Forest feature-importance results were:
