@@ -5,14 +5,9 @@
 - **Repo:** https://github.com/AliMahmoud67/FlyRank_Starter
 - **Date:** 2026-09-21
 
-> Copy this file to `work/capstone_report.md` and fill it in as you build. Sections 1–8
-> mirror the Pass / Needs-Work rubric axes, so nothing here is optional. Sections 0 and 9
-> are **paper sections**: your deployed research paper must carry both, and they're here so
-> you never rebuild them from memory at ship time.
-
 ## 0. Abstract
 
-This project asks whether search and content signals can be used to rank pages that are worth reviewing or refreshing so editors can prioritize their limited time. Using the FlyRank internship warehouse, February 2026 data was used as the feature window and March 2026 as the future outcome window, with five search and content features and 50,625 complete held-out test items. A time-aware Random Forest ranking model was compared with a transparent two-signal baseline using Precision@20 and Precision@50. The Random Forest achieved 75% Precision@20 and 78% Precision@50, compared with 65% and 66% for the baseline, with a 27.04% future-opportunity base rate. The resulting ranked queue is intended to help editors decide which pages to investigate first, while keeping the final refresh decision with human reviewers.
+This project asks whether search and content signals can be used to rank pages that are worth reviewing or refreshing so editors can prioritize their limited time. Using the FlyRank internship warehouse, February 2026 data was used as the feature window and March 2026 as the future outcome window, with five search and content features and 50,625 complete held-out test items. A time-aware Random Forest ranking model was compared with a transparent two-signal baseline using Precision@20 and Precision@50. The Random Forest achieved 80% Precision@20 and 80% Precision@50, compared with 45% and 52% for the baseline, with a 27.04% future-opportunity base rate. The resulting ranked queue is intended to help editors decide which pages to investigate first, while keeping the final refresh decision with human reviewers.
 
 ## 1. Problem framing
 
@@ -80,8 +75,8 @@ The baseline was evaluated on the same 50,625 items and using the same ranking m
 
 | Metric | Baseline |
 |---|---:|
-| Precision@20 | 65.00% |
-| Precision@50 | 66.00% |
+| Precision@20 | 45.00% |
+| Precision@50 | 52.00% |
 
 The baseline is intentionally simple and explainable. It provides a transparent reference point for evaluating whether the learned model adds useful ranking signal.
 
@@ -122,12 +117,12 @@ After removing rows with missing model features, the test set contained 50,625 c
 
 | Metric | Baseline | Random Forest |
 |---|---:|---:|
-| Precision@20 | 65.00% | 75.00% |
-| Precision@50 | 66.00% | 78.00% |
+| Precision@20 | 45.00% | 80.00% |
+| Precision@50 | 52.00% | 80.00% |
 
 The Random Forest produced higher precision at both review capacities.
 
-In the model's top 20 ranked pages, 15 were future opportunities and 5 were not. Several false positives had very low or zero February clicks and relatively low impression counts, showing that sparse search observations can make some pages difficult to rank correctly.
+In the model's top 20 ranked pages, 16 were future opportunities and 4 were not. The four false positives had zero February clicks and relatively low impression counts, showing that sparse search observations can make some pages difficult to rank correctly.
 
 The results are directional decision support for this dataset and time period, not a guarantee of future performance.
 
@@ -137,11 +132,11 @@ The Random Forest feature-importance results were:
 
 | Feature | Importance |
 |---|---:|
-| `gsc_clicks` | 0.3347 |
-| `gsc_impressions` | 0.2872 |
-| `word_count` | 0.1481 |
-| `content_age_days` | 0.1160 |
-| `gsc_avg_position` | 0.1141 |
+| `gsc_clicks` | 0.3296 |
+| `gsc_impressions` | 0.2920 |
+| `word_count` | 0.1490 |
+| `gsc_avg_position` | 0.1148 |
+| `content_age_days` | 0.1145 |
 
 The model relied most on clicks and impressions from the February feature window. Word count, content age, and average position contributed smaller amounts individually.
 
@@ -225,10 +220,10 @@ The file records:
 
 - test population size: `50,625`
 - base rate: `27.04%`
-- Precision@20 for the baseline: `65.00%`
-- Precision@20 for the Random Forest: `75.00%`
-- Precision@50 for the baseline: `66.00%`
-- Precision@50 for the Random Forest: `78.00%`
+- Precision@20 for the baseline: `45.00%`
+- Precision@20 for the Random Forest: `80.00%`
+- Precision@50 for the baseline: `52.00%`
+- Precision@50 for the Random Forest: `80.00%`
 
 The model-vs-baseline comparison chart is saved in:
 
@@ -247,12 +242,3 @@ The evaluation design is time-aware, so the final test outcome is kept after the
 Built on the FlyRank ML Internship dataset.
 
 Data source: [FlyRank](https://flyrank.ai)
----
-
-> **Claims checklist before submitting:** observed / measured / directional / decision-support
-> **Metrics vs. base rate:** report your task's base rate (majority-class %) next to any
-> precision@K or accuracy — a high score can just be a high base rate. AUC / lift over
-> baseline are the honest discrimination numbers.
-> language everywhere · no causal claims without an experiment or causal design · no
-> "predicted Google's algorithm" · no client-identifying details · numbers in this report
-> match a fresh re-run.
