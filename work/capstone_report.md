@@ -128,13 +128,13 @@ After removing rows with missing model features, the test set contained 50,625 c
 
 The Random Forest produced higher precision at both review capacities.
 
-In the top 20 model-ranked pages, 15 were future opportunities and 5 were not. The five false positives included pages with very low or zero February clicks and relatively low impression counts, suggesting that sparse observations can make some pages difficult to rank correctly.
+In the model's top 20 ranked pages, 15 were future opportunities and 5 were not. Several false positives had very low or zero February clicks and relatively low impression counts, showing that sparse search observations can make some pages difficult to rank correctly.
 
-The evaluation is directional decision support rather than a claim that the model will always identify pages that benefit from a refresh.
+The results are directional decision support for this dataset and time period, not a guarantee of future performance.
 
 ## 6. Interpretation
 
-The feature importance results from the Random Forest were:
+The Random Forest feature-importance results were:
 
 | Feature | Importance |
 |---|---:|
@@ -144,13 +144,11 @@ The feature importance results from the Random Forest were:
 | `content_age_days` | 0.1160 |
 | `gsc_avg_position` | 0.1141 |
 
-The model relied most on February clicks and impressions. Content length, content age, and search position contributed smaller amounts individually.
+The model relied most on clicks and impressions from the February feature window. Word count, content age, and average position contributed smaller amounts individually.
 
-This suggests that the model found search-volume and click-performance information particularly useful for distinguishing future opportunities in this dataset.
+The error analysis showed that some high-scoring pages did not become future opportunities. Several of these pages had zero February clicks and relatively low impression counts, suggesting that limited search observations can make the future outcome harder to identify.
 
-The error analysis showed that some high-scoring pages did not become future opportunities. Several of these pages had zero February clicks and relatively low impression counts, indicating that sparse search data can make the future outcome harder to identify.
-
-These feature-importance results describe associations used by the fitted model and should not be interpreted as causal effects.
+The feature-importance values describe associations used by the fitted model and should not be interpreted as causal effects.
 
 ## 7. Recommendation
 
@@ -167,7 +165,7 @@ The recommended workflow is:
 
 The model provides prioritization support rather than an automatic refresh decision. A high score does not guarantee that a page needs a refresh, and the editor should consider context that is not represented in the five model features.
 
-Confidence is higher in the aggregate ranking result than in any individual page recommendation because the top-ranked list still contains false positives.
+The final notebook also produces a ranked recommendation table with a model score, action, reason code, and confidence label.
 
 ## 8. Reproducibility
 
